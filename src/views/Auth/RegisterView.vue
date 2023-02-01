@@ -5,13 +5,7 @@
                 <h3 class="title is-3">Crear una cuenta</h3><hr>
                 <form action="#" @submit.prevent="register">
                     
-                    <div class="field">
-                        <label class="label">Nombre</label>
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Alex" v-model="name">
-                        </div>
-                    </div>
-
+                
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control">
@@ -25,6 +19,16 @@
                             <input class="input" type="password" v-model="password">
                         </div>
                     </div>
+                    <p class="notification is-danger mt-10" v-if="password.length < 8 && password.length > 0">La contraseña es demasiado corta</p>
+
+                    <div class="field">
+                        <label class="label">Confirmar Contraseña</label>
+                        <div class="control">
+                            <input class="input" type="password" v-model="confirmPassword">
+                        </div>
+                    </div>
+
+                    <p class="notification is-danger mt-10" v-if="password !== confirmPassword && password.length > 0">Contraseñas no coinciden</p>
                     
                     <button type="submit" class="button is-primary">Registrarme</button>
 
@@ -38,41 +42,43 @@
 </template>
 
 <script>
-    import {getAuth, createUserWithEmailAndPassword} from "firebase/auth"
+    
+import axios from 'axios';
+
     
 
     export default {
         data() {
             return {
-                name:'',
-                email:'',
-                password:'',
-                error:''
+                formData:{
+                    email:'',
+                    password:''
+                },
+                password: '',
+                confirmPassword: ''
+                
             }
         },
         name: 'register-view',
+        computed: {
+            passwordMatch() {
+            return this.password === this.confirmPassword
+            }
+        },
         methods: {
-            register(){
-                this.error = ''
-                if(this.name && this.email && this.password) {
-                    const auth = getAuth();
-                        createUserWithEmailAndPassword(auth, this.email, this.password)
-                        .then((userCredential)=> {
-                            const user = userCredential.user;
-                            console.log(user)
-                            this.$router.push({name: 'Dashboard'})
-                        })
-                        .catch((err)=>{
-                            const errorCode = err.code;
-                            console.log(errorCode)
-                            this.errorMessage = err.message;
-                            alert(this.err='contraseña no valida');
-                            // ..
-                        });
-                } else{
-                    this.error = 'Todos los campos son obligatorios'
-                }
-                    
+
+            register() {
+                this.formData.email = this.email;
+                this.formData.password = this.password;
+
+                axios.post('https://api-stage.carrazo.pe/auth/singup', this.formData)
+                .then(response => {
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    this.error = error.message;
+                })
+                this.$router.push({name: 'login'})
             }
         } 
     }

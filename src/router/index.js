@@ -3,7 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import LogInView from '../views/Auth/LogInView.vue'
 import RegisterView from '../views/Auth/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
-import {auth} from '../main'
+import formAuth from '../views/formAuth.vue'
+
 
 
 
@@ -37,10 +38,18 @@ const routes = [
     name: 'Dashboard',
     component: DashboardView,
     meta: {
-      requiresAuth: true,
+      //requiresAuth: true,
       title: 'Dashboard'
     }
-  }
+  },
+  {
+    path: '/form',
+    name: 'form',
+    component: formAuth,
+    meta: {
+      title: 'form'
+    }
+  },
 ]
 
 
@@ -49,6 +58,7 @@ const router = createRouter({
   routes
 })
 
+/*
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title;
   if(to.path === '/login' && auth.currentUser) {
@@ -60,7 +70,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
   next();
-})
+})*/
 
 export default router
 

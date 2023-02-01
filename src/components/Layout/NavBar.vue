@@ -21,7 +21,7 @@
                     <template v-if="user">
                         <div class="navbar-item has-dropdown is-hoverable">
                             <a class="navbar-link">
-                            {{ user.email }}
+                            {{ user.email}}
                             </a>
 
                             <div class="navbar-dropdown">
@@ -57,13 +57,16 @@
 
 <script>
 
-import { getAuth } from '@firebase/auth'
+
+
+
 
 export default {
     data() {
         return {
             isOpen: false,
             user: null
+            
         }
     },
     methods: {
@@ -72,20 +75,31 @@ export default {
             this.isOpen = status
         }, 
         logout() {
-            getAuth().signOut().then(() => {
-                this.$router.push({name: 'login'})
-            })
+            localStorage.removeItem("userData");
+            this.user = null;
+            this.$router.push({ name: "login" });
         },
+        
     },
-    created() {
-        getAuth().onAuthStateChanged(user => {
-            if(user) {
-                this.user = user
-            } else {
-                this.user = null
-            }
-        })
+    mounted() {
+        let data = JSON.parse(localStorage.getItem("userData"));
+        if (data) {
+            this.$router.push({name: 'Dashboard'})
+            this.user = data;
+        }else{
+            this.$router.push({name: 'login'})
+        }
+        
+    },
+    watch:{
+        user:{
+            handler(newValue) {
+                this.user = newValue
+            },
+            deep: true
+        }
     }
+    
 }
 
 </script>

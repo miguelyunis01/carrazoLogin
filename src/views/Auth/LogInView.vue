@@ -8,14 +8,14 @@
                     <div class="field">
                         <label class="label">Email</label>
                         <div class="control">
-                            <input class="input" type="text" placeholder="alexsmith@gmail.com" v-model="email">
+                            <input class="input" type="text" placeholder="alexsmith@gmail.com" v-model="formData.email">
                         </div>
                     </div>
 
                     <div class="field">
                         <label class="label">Contraseña</label>
                         <div class="control">
-                            <input class="input" type="password" v-model="password">
+                            <input class="input" type="password" v-model="formData.password">
                         </div>
                     </div>
 
@@ -31,40 +31,33 @@
 </template>
 
 <script>
-    import {getAuth, signInWithEmailAndPassword} from "firebase/auth"
-    
+   import axios from 'axios'
 
     export default {
         data() {
             return {
-                email: '',
-                password:'',
+                formData:{
+                    email:'',
+                    password:''
+                },
                 error:''
             }
         },
         name: 'login-view',
         methods: {
             login(){
-                if( this.email && this.password) {
-                    const auth = getAuth();
-                        signInWithEmailAndPassword(auth, this.email, this.password)
-                        .then((userCredential)=> {
-                            this.$router.push({name: 'Dashboard'})
-                            const user = userCredential.user;
-                            console.log(user)
-                            
-                        })
-                        .catch((err)=>{
-                            const errorCode = err.code;
-                            console.log(errorCode)
-                            this.errorMessage = err.message;
-                            this.error='usuario o contraseña incorrectos';
-                            // ..
-                        });
-                } else{
-                    this.error = 'Todos los campos son obligatorios'
-                }
-                    
+            
+                
+                axios.post('https://api-stage.carrazo.pe/auth/login', this.formData)
+                .then((response) => {
+                    console.log(response.data)
+                    localStorage.setItem('userData', JSON.stringify(response.data))
+                    this.$router.push('/form')
+                })
+                .catch(error => {
+                    this.error = error.message;
+                })
+                
             }
         } 
     }
